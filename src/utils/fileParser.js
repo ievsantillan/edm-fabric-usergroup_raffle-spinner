@@ -1,4 +1,4 @@
-import readXlsxFile from 'read-excel-file';
+import readXlsxFile from 'read-excel-file/browser';
 import Papa from 'papaparse';
 
 function parseCSV(file) {
