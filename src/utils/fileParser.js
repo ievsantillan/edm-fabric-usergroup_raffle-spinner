@@ -1,30 +1,47 @@
-import * as XLSX from 'xlsx';
+import readXlsxFile from 'read-excel-file';
+import Papa from 'papaparse';
 
-export function parseFile(file) {
+function parseCSV(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-        if (rows.length === 0) {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (!results.data || results.data.length === 0) {
           reject(new Error('No data found in the file.'));
           return;
         }
-
-        const columns = Object.keys(rows[0]);
-        resolve({ columns, rows });
-      } catch (err) {
-        reject(new Error('Failed to parse file. Please check the format.'));
-      }
-    };
-
-    reader.onerror = () => reject(new Error('Failed to read file.'));
-    reader.readAsArrayBuffer(file);
+        const columns = results.meta.fields || Object.keys(results.data[0]);
+        resolve({ columns, rows: results.data });
+      },
+      error: (err) => reject(new Error(err.message || 'Failed to parse CSV.')),
+    });
   });
+}
+
+async function parseExcel(file) {
+  const rows = await readXlsxFile(file);
+  if (!rows || rows.length < 2) {
+    throw new Error('No data found in the file.');
+  }
+  const columns = rows[0].map((h) => String(h ?? '').trim());
+  const data = rows.slice(1).map((row) => {
+    const obj = {};
+    columns.forEach((col, i) => {
+      obj[col] = row[i] != null ? String(row[i]) : '';
+    });
+    return obj;
+  });
+  return { columns, rows: data };
+}
+
+export function parseFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    return parseCSV(file);
+  }
+  if (ext === 'xlsx' || ext === 'xls') {
+    return parseExcel(file);
+  }
+  return Promise.reject(new Error('Unsupported file type.'));
 }

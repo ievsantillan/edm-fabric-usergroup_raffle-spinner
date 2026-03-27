@@ -91,7 +91,7 @@ raffle-spinner/
 │   │   ├── useAudio.js            # Web Audio API sound effects (tick, fanfare)
 │   │   └── useRaffle.js           # Raffle state management
 │   ├── utils/
-│   │   └── fileParser.js          # CSV/Excel file parser using SheetJS
+│   │   └── fileParser.js          # CSV/Excel file parser (PapaParse + read-excel-file)
 │   ├── App.jsx                    # Main app shell and layout
 │   ├── App.css                    # Fabric-themed component styles
 │   ├── index.css                  # Global reset and CSS variables
@@ -109,7 +109,8 @@ raffle-spinner/
 | [React 19](https://react.dev/) | UI framework | [React Docs](https://react.dev/learn) |
 | [Vite 8](https://vite.dev/) | Build tool & dev server | [Vite Guide](https://vite.dev/guide/) |
 | [Framer Motion](https://www.framer.com/motion/) | Animation library | [Framer Motion Docs](https://www.framer.com/motion/introduction/) |
-| [SheetJS (xlsx)](https://sheetjs.com/) | Excel & CSV file parsing | [SheetJS Docs](https://docs.sheetjs.com/) |
+| [PapaParse](https://www.papaparse.com/) | CSV file parsing | [PapaParse Docs](https://www.papaparse.com/docs) |
+| [read-excel-file](https://gitlab.com/nicedoc/read-excel-file) | Excel (.xlsx) file parsing | [read-excel-file README](https://gitlab.com/nicedoc/read-excel-file#readme) |
 | [canvas-confetti](https://github.com/catdad/canvas-confetti) | Confetti particle effects | [canvas-confetti README](https://github.com/catdad/canvas-confetti#readme) |
 | [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) | Procedural sound effects | [MDN Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API) |
 
