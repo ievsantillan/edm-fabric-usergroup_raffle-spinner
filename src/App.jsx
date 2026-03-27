@@ -103,7 +103,7 @@ function App() {
           />
           <div>
             <h1 className="header-title">Edmonton Fabric User Group</h1>
-            <p className="header-subtitle">Post FabCon Raffle &middot; Tuesday, Mar 31 &middot; 4:30 PM to 6:00 PM MDT</p>
+            <p className="header-subtitle">Post FabCon Raffle &middot; Tuesday, Mar 31, 2026</p>
           </div>
         </div>
       </header>
