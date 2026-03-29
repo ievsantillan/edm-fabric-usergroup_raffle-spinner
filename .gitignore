@@ -25,5 +25,6 @@ dist-ssr
 
 # Data files (PII protection)
 *.csv
+!public/test-participants.csv
 *.xlsx
 *.xls
