@@ -2,7 +2,17 @@ import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
-export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumber }) {
+export default function WinnerDisplay({
+  winner,
+  prize,
+  prizes,
+  show,
+  onDismiss,
+  onChangePrize,
+  onReroll,
+  canReroll,
+  drawNumber,
+}) {
   const confettiFired = useRef(false);
   const dismissBtnRef = useRef(null);
   // Confetti is pure decorative motion and can trigger motion sickness, so we
@@ -12,6 +22,10 @@ export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumb
   const shouldReduceMotion = useReducedMotion();
   const labelId = 'winner-label';
   const nameId = 'winner-name';
+  const prizeSelectId = 'winner-prize-select';
+  const hasPrizeChoices =
+    Array.isArray(prizes) && prizes.length > 0 && typeof onChangePrize === 'function';
+  const canShowReroll = typeof onReroll === 'function';
 
   useEffect(() => {
     if (!show || !winner) {
@@ -103,14 +117,58 @@ export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumb
             <div className="winner-stars" aria-hidden="true">
               ⭐ Congratulations! ⭐
             </div>
-            <button
-              ref={dismissBtnRef}
-              className="winner-dismiss"
-              onClick={onDismiss}
-              aria-keyshortcuts="Escape"
-            >
-              Continue
-            </button>
+
+            {hasPrizeChoices && (
+              <div className="winner-prize-override">
+                <label htmlFor={prizeSelectId} className="winner-prize-override-label">
+                  Change prize:
+                </label>
+                <select
+                  id={prizeSelectId}
+                  className="winner-prize-override-select"
+                  value={prize ?? ''}
+                  onChange={(e) => onChangePrize(e.target.value || null)}
+                >
+                  {/* If the current prize isn't in the list (e.g. legacy data),
+                      surface it so the select stays in sync rather than silently
+                      flipping to the first option. */}
+                  {prize && !prizes.includes(prize) && (
+                    <option value={prize}>{prize}</option>
+                  )}
+                  {prizes.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="winner-actions">
+              <button
+                ref={dismissBtnRef}
+                className="winner-dismiss"
+                onClick={onDismiss}
+                aria-keyshortcuts="Escape"
+              >
+                Continue
+              </button>
+              {canShowReroll && (
+                <button
+                  className="winner-reroll"
+                  onClick={onReroll}
+                  disabled={!canReroll}
+                  title={
+                    canReroll
+                      ? 'Remove this person from the pool and draw a new winner'
+                      : 'No other participants remain — cannot re-roll'
+                  }
+                  aria-keyshortcuts="N"
+                >
+                  Not here — re-roll
+                </button>
+              )}
+            </div>
           </motion.div>
         </motion.div>
       )}

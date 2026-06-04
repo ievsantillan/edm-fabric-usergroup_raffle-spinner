@@ -23,8 +23,10 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **Confetti celebration** — Multi-burst confetti explosion when a winner is drawn
 - **CSV & Excel support** — Upload `.csv`, `.xlsx`, or `.xls` files; pick which column contains names
 - **Multi-winner draws** — Previous winners are removed from the pool automatically
+- **Prize-to-winner assignment** — Optionally provide an ordered prize list; each draw auto-assigns the next prize. Override on the fly via a dropdown on the winner overlay if you want to swap which prize this person gets.
+- **"Not here — re-roll"** — If the drawn person isn't in the room, one click (or `N`) removes them from the pool, restores the prize, and immediately spins for a replacement. The absentee never appears in the winners list / CSV export.
 - **Winner history sidebar** — Track all drawn winners in order, with one-click CSV export
-- **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `R` to reset, `E` to export winners to CSV
+- **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `N` to re-roll an absent winner, `R` to reset, `E` to export winners to CSV
 - **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM) for post-event fulfillment & sponsor reporting
 - **Crash-safe — your raffle survives a refresh** — Participants, prizes, and winners are saved to `localStorage` after every change. Accidentally close the tab or the laptop goes to sleep? Reopen and continue exactly where you left off, with a restored-session banner so you know what happened.
 - **Duplicate-name safe** — Two attendees with the same name (e.g. two John Smiths) are tracked as separate entries, so picking one doesn't accidentally remove the other from the pool.

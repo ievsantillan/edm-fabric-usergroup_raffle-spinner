@@ -122,6 +122,33 @@ export function useRaffle() {
     setShowWinner(false);
   }, []);
 
+  // Override the prize assigned to the most recent winner. Used by the in-
+  // overlay prize dropdown so the organizer can swap the auto-assigned prize
+  // (which defaults to the next slot in the queue) before moving on.
+  const updateLastWinnerPrize = useCallback((prize) => {
+    setPersisted((prev) => {
+      if (prev.winners.length === 0) return prev;
+      const next = prev.winners.slice();
+      const last = next[next.length - 1];
+      next[next.length - 1] = { ...last, prize: prize || null };
+      return { ...prev, winners: next };
+    });
+  }, []);
+
+  // "Not here, re-roll" — the just-picked person is absent. We unrecord the
+  // win (so it doesn't appear in the winners list / export) but we KEEP them
+  // removed from `remainingParticipants` so they can't be picked again. The
+  // prize index automatically rolls back since it's derived from winners.length,
+  // so the next draw lands on the same prize.
+  const rerollLastWinner = useCallback(() => {
+    setPersisted((prev) => {
+      if (prev.winners.length === 0) return prev;
+      return { ...prev, winners: prev.winners.slice(0, -1) };
+    });
+    setCurrentWinner(null);
+    setShowWinner(false);
+  }, []);
+
   const resetRaffle = useCallback(() => {
     setPersisted((prev) => ({
       ...prev,
@@ -178,6 +205,8 @@ export function useRaffle() {
     pickWinner,
     confirmWinner,
     dismissWinner,
+    updateLastWinnerPrize,
+    rerollLastWinner,
     resetRaffle,
     clearAll,
   };

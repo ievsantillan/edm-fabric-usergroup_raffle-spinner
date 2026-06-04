@@ -46,6 +46,7 @@ function App() {
     remainingParticipants,
     winners,
     currentWinner,
+    prizes,
     currentPrize,
     allPrizesAwarded,
     prizeProgress,
@@ -58,6 +59,8 @@ function App() {
     pickWinner,
     confirmWinner,
     dismissWinner,
+    updateLastWinnerPrize,
+    rerollLastWinner,
     resetRaffle,
     clearAll: clearRaffleState,
   } = useRaffle();
@@ -146,6 +149,28 @@ function App() {
     resetRaffle();
   }, [resetRaffle]);
 
+  // Override the prize on the just-drawn winner (in case the organizer wants
+  // to swap which prize this person gets vs. the auto-assigned default).
+  const handleChangePrize = useCallback(
+    (prize) => {
+      updateLastWinnerPrize(prize);
+    },
+    [updateLastWinnerPrize]
+  );
+
+  // "Not here, re-roll" — unrecord the win, keep the person filtered out of
+  // the pool (they're absent), and immediately kick off another spin so the
+  // organizer doesn't have to press SPIN again. We schedule the auto-spin via
+  // setTimeout so the React state update from rerollLastWinner has time to
+  // flush before SlotMachine reads the new remainingParticipants pool.
+  const handleReroll = useCallback(() => {
+    if (winners.length === 0 || remainingParticipants.length === 0) return;
+    rerollLastWinner();
+    window.setTimeout(() => {
+      slotRef.current?.spin();
+    }, 0);
+  }, [rerollLastWinner, winners.length, remainingParticipants.length]);
+
   const handleExport = useCallback(() => {
     exportWinnersCsv(winners, { eventName: EVENT_NAME, eventDate: EVENT_DATE });
   }, [winners]);
@@ -195,6 +220,21 @@ function App() {
       // Esc works even when a button is focused (e.g. the winner overlay's Continue button).
       if (e.code === 'Escape' && showWinner) {
         dismissWinner();
+        return;
+      }
+
+      // "Not here — re-roll" shortcut. Only active while the winner overlay is
+      // shown AND at least one other participant remains in the pool to pick
+      // from. We allow this regardless of focus so the organizer can keep their
+      // hands on the keyboard during the draw.
+      if (
+        e.code === 'KeyN' &&
+        showWinner &&
+        !isSpinning &&
+        remainingParticipants.length > 0
+      ) {
+        e.preventDefault();
+        handleReroll();
         return;
       }
 
@@ -251,6 +291,7 @@ function App() {
     dismissWinner,
     handleReset,
     handleExport,
+    handleReroll,
   ]);
 
   return (
@@ -439,6 +480,8 @@ function App() {
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
                 <kbd>Esc</kbd> dismiss
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
+                <kbd>N</kbd> re-roll
+                <span className="shortcuts-sep" aria-hidden="true">·</span>
                 <kbd>R</kbd> reset
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
                 <kbd>E</kbd> export
@@ -471,8 +514,12 @@ function App() {
       <WinnerDisplay
         winner={currentWinner?.name ?? null}
         prize={winners[winners.length - 1]?.prize ?? null}
+        prizes={prizes}
         show={showWinner}
         onDismiss={dismissWinner}
+        onChangePrize={handleChangePrize}
+        onReroll={handleReroll}
+        canReroll={remainingParticipants.length > 0}
         drawNumber={winners.length}
       />
     </div>

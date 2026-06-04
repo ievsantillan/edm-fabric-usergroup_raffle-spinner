@@ -838,6 +838,53 @@
   margin-bottom: 32px;
 }
 
+.winner-prize-override {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 20px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--fabric-border);
+  border-radius: 10px;
+  max-width: 360px;
+}
+
+.winner-prize-override-label {
+  font-size: 13px;
+  color: var(--fabric-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.winner-prize-override-select {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--fabric-border);
+  background: var(--fabric-surface);
+  color: var(--fabric-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.winner-prize-override-select:hover,
+.winner-prize-override-select:focus-visible {
+  border-color: var(--fabric-teal);
+  outline: none;
+}
+
+.winner-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .winner-dismiss {
   padding: 14px 40px;
   font-size: 16px;
@@ -854,6 +901,31 @@
 .winner-dismiss:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(44, 242, 103, 0.45);
+}
+
+.winner-reroll {
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid var(--fabric-border);
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--fabric-text-secondary);
+  transition: all 0.2s;
+}
+
+.winner-reroll:hover:not(:disabled),
+.winner-reroll:focus-visible:not(:disabled) {
+  border-color: var(--fabric-orange, #ff8a3d);
+  color: var(--fabric-text);
+  background: rgba(255, 138, 61, 0.08);
+  outline: none;
+}
+
+.winner-reroll:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ===== RESPONSIVE ===== */
