@@ -11,7 +11,7 @@
 // later without booby-trapping users with stale data.
 
 const PREFIX = 'raffle-spinner';
-const VERSION = 'v1';
+const VERSION = 'v2';
 
 function key(name) {
   return `${PREFIX}:${VERSION}:${name}`;
@@ -49,11 +49,12 @@ export function removeKey(name) {
 }
 
 // Wipe every key this app owns. Used by the "Start fresh" action so we don't
-// leave orphaned data behind (e.g. if we add more keys in the future).
+// leave orphaned data behind, including keys from older schema versions
+// (e.g. raffle-spinner:v1:* once we've moved on to v2).
 export function clearAll() {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
-    const prefix = `${PREFIX}:${VERSION}:`;
+    const prefix = `${PREFIX}:`;
     const toRemove = [];
     for (let i = 0; i < window.localStorage.length; i += 1) {
       const k = window.localStorage.key(i);

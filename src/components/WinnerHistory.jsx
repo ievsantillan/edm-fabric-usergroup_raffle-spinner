@@ -23,7 +23,7 @@ export default function WinnerHistory({ winners, onReset, onExport }) {
       </div>
       <ul className="history-list">
         {winners.map((w, i) => (
-          <li key={`${w.name}-${i}`} className="history-item">
+          <li key={w.id ?? `${w.name}-${i}`} className="history-item">
             <span className="history-number">#{i + 1}</span>
             <div className="history-text">
               <span className="history-name">{w.name}</span>

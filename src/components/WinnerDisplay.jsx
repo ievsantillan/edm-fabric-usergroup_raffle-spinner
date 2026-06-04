@@ -1,10 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumber }) {
   const confettiFired = useRef(false);
   const dismissBtnRef = useRef(null);
+  // Confetti is pure decorative motion and can trigger motion sickness, so we
+  // skip it entirely when the OS-level "Reduce Motion" setting is enabled.
+  // The MotionConfig wrapper in main.jsx handles the rest (transforms become
+  // simple opacity fades for framer-motion children automatically).
+  const shouldReduceMotion = useReducedMotion();
   const labelId = 'winner-label';
   const nameId = 'winner-name';
 
@@ -15,6 +20,17 @@ export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumb
     }
     if (confettiFired.current) return undefined;
     confettiFired.current = true;
+
+    // Move focus into the dialog for keyboard / screen-reader users. We do
+    // this regardless of motion preference — it's a focus management concern,
+    // not an animation one.
+    const focusTimer = window.setTimeout(() => {
+      dismissBtnRef.current?.focus();
+    }, 0);
+
+    if (shouldReduceMotion) {
+      return () => window.clearTimeout(focusTimer);
+    }
 
     // Fire confetti from both sides
     const defaults = {
@@ -45,16 +61,11 @@ export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumb
       fire(0.3, { spread: 100, startVelocity: 45, origin: { x: 0.5, y: 0.5 } });
     }, 300);
 
-    // Move focus into the dialog for keyboard / screen-reader users
-    const focusTimer = window.setTimeout(() => {
-      dismissBtnRef.current?.focus();
-    }, 0);
-
     return () => {
       window.clearTimeout(burstTimer);
       window.clearTimeout(focusTimer);
     };
-  }, [show, winner]);
+  }, [show, winner, shouldReduceMotion]);
 
   return (
     <AnimatePresence>

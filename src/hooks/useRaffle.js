@@ -3,9 +3,13 @@ import { loadJson, saveJson } from '../utils/storage';
 
 const STORAGE_KEY = 'raffle';
 
-// Shape we persist to localStorage. Only includes data needed to resume a
-// raffle in progress — transient UI flags (isSpinning, showWinner, etc.)
-// always reset on reload because they describe in-flight animations.
+// Persisted shape. Participants and winners are now identified by a stable
+// `id` so duplicate names (two attendees called "John Smith") are treated as
+// distinct entries — picking one no longer removes the other from the pool.
+//   - participants: { id: string, name: string }[]
+//   - winners:      { id: string|null, name: string, prize: string|null }[]
+//     (id is nullable to tolerate legacy data; in practice it's always set
+//      for new draws.)
 const EMPTY_STATE = {
   allParticipants: [],
   remainingParticipants: [],
@@ -13,18 +17,24 @@ const EMPTY_STATE = {
   prizes: [],
 };
 
+function isParticipantObject(x) {
+  return x && typeof x === 'object' && typeof x.id === 'string' && typeof x.name === 'string';
+}
+
 function loadInitialState() {
   const saved = loadJson(STORAGE_KEY, null);
   if (!saved || typeof saved !== 'object') return EMPTY_STATE;
-  // Defensive: ensure each field exists and is an array. Persisted shape
-  // changes should bump the storage version key instead of being patched
-  // here, but a stray missing field shouldn't crash the app.
-  return {
-    allParticipants: Array.isArray(saved.allParticipants) ? saved.allParticipants : [],
-    remainingParticipants: Array.isArray(saved.remainingParticipants) ? saved.remainingParticipants : [],
-    winners: Array.isArray(saved.winners) ? saved.winners : [],
-    prizes: Array.isArray(saved.prizes) ? saved.prizes : [],
-  };
+  // Defensive: ensure each field exists and every participant is a {id, name}.
+  // Anything that isn't the right shape is dropped rather than crashing.
+  const allParticipants = Array.isArray(saved.allParticipants)
+    ? saved.allParticipants.filter(isParticipantObject)
+    : [];
+  const remainingParticipants = Array.isArray(saved.remainingParticipants)
+    ? saved.remainingParticipants.filter(isParticipantObject)
+    : [];
+  const winners = Array.isArray(saved.winners) ? saved.winners : [];
+  const prizes = Array.isArray(saved.prizes) ? saved.prizes : [];
+  return { allParticipants, remainingParticipants, winners, prizes };
 }
 
 export function useRaffle() {
@@ -46,14 +56,18 @@ export function useRaffle() {
     saveJson(STORAGE_KEY, persisted);
   }, [persisted]);
 
+  // Build the canonical participant list. Drops blanks and assigns each row a
+  // stable synthetic id derived from its load-order index so duplicate names
+  // remain distinct entities throughout the raffle.
   const loadParticipants = useCallback((names) => {
-    const unique = [...new Set(names.filter((n) => n && String(n).trim()))].map(
-      (n) => String(n).trim()
-    );
+    const cleaned = names
+      .map((n) => (n == null ? '' : String(n).trim()))
+      .filter(Boolean)
+      .map((name, i) => ({ id: `p-${i}`, name }));
     setPersisted((prev) => ({
       ...prev,
-      allParticipants: unique,
-      remainingParticipants: unique,
+      allParticipants: cleaned,
+      remainingParticipants: cleaned,
       winners: [],
     }));
     setCurrentWinner(null);
@@ -70,24 +84,37 @@ export function useRaffle() {
     setPersisted((prev) => ({ ...prev, prizes: cleaned }));
   }, []);
 
-  // Pick a random winner from the remaining pool without mutating state.
-  // Returns null when the pool is empty or a spin is already in flight.
+  // Pick a random participant from the remaining pool without mutating state.
+  // Returns the full {id, name} object so the caller can match by id later
+  // (essential when two participants share a name).
   const pickWinner = useCallback(() => {
     if (remainingParticipants.length === 0 || isSpinning) return null;
     const idx = Math.floor(Math.random() * remainingParticipants.length);
     return remainingParticipants[idx];
   }, [remainingParticipants, isSpinning]);
 
-  const confirmWinner = useCallback((name) => {
+  // Confirm a draw. Accepts a participant object {id, name} so we filter by id
+  // — duplicate-name participants are no longer accidentally both removed.
+  const confirmWinner = useCallback((participant) => {
+    if (!participant || typeof participant !== 'object' || !participant.id) {
+      // Should not happen with the current SlotMachine, but guard anyway so a
+      // malformed call doesn't corrupt the pool.
+      return;
+    }
     setPersisted((prev) => {
       const prize = prev.prizes[prev.winners.length] ?? null;
       return {
         ...prev,
-        winners: [...prev.winners, { name, prize }],
-        remainingParticipants: prev.remainingParticipants.filter((p) => p !== name),
+        winners: [
+          ...prev.winners,
+          { id: participant.id, name: participant.name, prize },
+        ],
+        remainingParticipants: prev.remainingParticipants.filter(
+          (p) => p.id !== participant.id
+        ),
       };
     });
-    setCurrentWinner(name);
+    setCurrentWinner(participant);
     setShowWinner(true);
   }, []);
 

@@ -27,6 +27,8 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `R` to reset, `E` to export winners to CSV
 - **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM) for post-event fulfillment & sponsor reporting
 - **Crash-safe — your raffle survives a refresh** — Participants, prizes, and winners are saved to `localStorage` after every change. Accidentally close the tab or the laptop goes to sleep? Reopen and continue exactly where you left off, with a restored-session banner so you know what happened.
+- **Duplicate-name safe** — Two attendees with the same name (e.g. two John Smiths) are tracked as separate entries, so picking one doesn't accidentally remove the other from the pool.
+- **Accessible** — Honors your OS-level **Reduce Motion** preference (skips the spin animation and confetti so reveals are instant), keeps keyboard focus on the SPIN button after each draw, and announces the winner via `aria-live` for screen readers.
 - **Global Fabric Community themed** — Dark navy UI with signature green accents and gold winner highlights
 - **Fully client-side** — No backend or server required; runs entirely in the browser
 

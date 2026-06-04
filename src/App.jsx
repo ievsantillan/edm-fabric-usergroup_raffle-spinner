@@ -81,6 +81,18 @@ function App() {
     saveJson(PRIZES_TEXT_KEY, prizesText);
   }, [prizesText]);
 
+  // When the winner overlay closes, return focus to the SPIN button so the
+  // organizer can keep going with keyboard alone. We track the previous value
+  // via a ref so this only fires on the true → false transition (not on
+  // mount, and not on every re-render while the overlay is open).
+  const prevShowWinner = useRef(false);
+  useEffect(() => {
+    if (prevShowWinner.current && !showWinner) {
+      slotRef.current?.focusSpinButton?.();
+    }
+    prevShowWinner.current = showWinner;
+  }, [showWinner]);
+
   const handleFileParsed = useCallback((data) => {
     setFileData(data);
     setSelectedColumn('');
@@ -457,7 +469,7 @@ function App() {
 
       {/* Winner celebration overlay */}
       <WinnerDisplay
-        winner={currentWinner}
+        winner={currentWinner?.name ?? null}
         prize={winners[winners.length - 1]?.prize ?? null}
         show={showWinner}
         onDismiss={dismissWinner}
