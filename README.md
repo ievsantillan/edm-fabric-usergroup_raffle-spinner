@@ -1,6 +1,6 @@
 # Edmonton Fabric User Group — Raffle Spinner
 
-A visually appealing slot-machine-style raffle spinner built for the Edmonton Fabric User Group's Post FabCon event. Upload a CSV or Excel file of participants, pick the name column, and spin to draw winners — complete with sound effects, confetti, and Microsoft Fabric branding.
+A visually appealing slot-machine-style raffle spinner built for the Edmonton Fabric User Group. Upload a CSV or Excel file of participants, pick the name column, and spin to draw winners — complete with sound effects, confetti, and a color scheme inspired by the [Global Fabric Community](https://globalfabric.community/).
 
 <p align="center">
   <img src="public/edm-fabric-usergroup-raffle-spinner_main.png" alt="Raffle Spinner - Main Screen" width="600" />
@@ -23,7 +23,7 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **Multi-winner draws** — Previous winners are removed from the pool automatically
 - **Winner history sidebar** — Track all drawn winners in order
 - **Keyboard shortcuts** — `Space` to spin, `Escape` to dismiss the winner overlay
-- **Microsoft Fabric themed** — Dark UI with purple/teal gradients and gold winner accents
+- **Global Fabric Community themed** — Dark navy UI with signature green accents and gold winner highlights
 - **Fully client-side** — No backend or server required; runs entirely in the browser
 
 ---
@@ -37,22 +37,30 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 
 ## Getting Started
 
-### 1. Install dependencies
+### 1. Clone the repo
 
 ```bash
-cd raffle-spinner
+git clone https://github.com/<your-org>/edm-fabric-usergroup_raffle-spinner.git
+cd edm-fabric-usergroup_raffle-spinner
+```
+
+### 2. Install dependencies
+
+```bash
 npm install
 ```
 
-### 2. Start the development server
+### 3. Start the development server
 
 ```bash
 npm run dev
 ```
 
-The app will be available at **http://localhost:5173**.
+Vite will print a local URL (default **http://localhost:5173**). Open it in your browser — the app hot-reloads as you edit files.
 
-### 3. Build for production
+To stop the dev server, press `Ctrl+C` in the terminal.
+
+### 4. Build for production
 
 ```bash
 npm run build
@@ -63,6 +71,47 @@ The optimized output will be in the `dist/` folder. You can preview the producti
 ```bash
 npm run preview
 ```
+
+If you'll be hosting under a sub-path (e.g. GitHub Pages project sites), set `BASE_PATH` when building so asset URLs resolve correctly:
+
+```bash
+BASE_PATH=/raffle-spinner/ npm run build      # macOS / Linux
+$env:BASE_PATH='/raffle-spinner/'; npm run build  # Windows PowerShell
+```
+
+---
+
+## Customizing for Your Event
+
+All event-specific text lives in **three constants** at the top of [`src/App.jsx`](src/App.jsx). Update these for each new event — nothing else needs to change.
+
+```jsx
+// src/App.jsx
+const EVENT_NAME    = 'Edmonton Fabric User Group';
+const EVENT_TAGLINE = 'Global Fabric Day Raffle';
+const EVENT_DATE    = '2026-06-27'; // YYYY-MM-DD
+```
+
+| Constant | What it controls | Example |
+|---|---|---|
+| `EVENT_NAME` | Large title in the header | `Edmonton Fabric User Group` |
+| `EVENT_TAGLINE` | Short description before the date | `Global Fabric Day Raffle` |
+| `EVENT_DATE` | ISO date (`YYYY-MM-DD`). Rendered as `Saturday, Jun 27, 2026` | `2026-06-27` |
+
+The header subtitle is composed as: **`{EVENT_TAGLINE} · {formatted EVENT_DATE}`**.
+
+### Changing logos
+
+The header shows two logos sourced from `public/`:
+
+- **Left:** `public/edm_fabusergroup.png` — your local user group
+- **Right:** `public/global-fabric-community-logo.svg` — links to <https://globalfabric.community/>
+
+Replace either file (keep the same filename) or edit the `<img>` tags in `src/App.jsx` to point at different assets.
+
+### Changing the theme
+
+Color variables live in [`src/index.css`](src/index.css) under `:root` (the `--gfc-*` palette). Backwards-compatible `--fabric-*` aliases mean existing component CSS keeps working when you swap the palette.
 
 ---
 

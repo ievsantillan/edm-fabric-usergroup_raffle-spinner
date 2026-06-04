@@ -28,3 +28,6 @@ dist-ssr
 !public/test-participants.csv
 *.xlsx
 *.xls
+
+# Playwright MCP automation artifacts (screenshots, snapshots, console logs)
+.playwright-mcp/

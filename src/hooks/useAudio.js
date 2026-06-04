@@ -1,20 +1,35 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export function useAudio() {
   const ctxRef = useRef(null);
 
   const getCtx = useCallback(() => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
-      ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      if (!Ctor) return null;
+      ctxRef.current = new Ctor();
     }
     if (ctxRef.current.state === 'suspended') {
-      ctxRef.current.resume();
+      // Fire-and-forget; some browsers (Safari/iOS) return a promise.
+      ctxRef.current.resume().catch(() => {});
     }
     return ctxRef.current;
   }, []);
 
+  // Close the AudioContext on unmount so we don't leak audio hardware handles.
+  useEffect(() => {
+    return () => {
+      const ctx = ctxRef.current;
+      if (ctx && ctx.state !== 'closed') {
+        ctx.close().catch(() => {});
+      }
+      ctxRef.current = null;
+    };
+  }, []);
+
   const playTick = useCallback((pitch = 800) => {
     const ctx = getCtx();
+    if (!ctx) return;
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -30,6 +45,7 @@ export function useAudio() {
 
   const playFanfare = useCallback(() => {
     const ctx = getCtx();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
     // Ascending arpeggio: C5, E5, G5, C6
@@ -64,24 +80,5 @@ export function useAudio() {
     });
   }, [getCtx]);
 
-  const playDrumroll = useCallback(() => {
-    const ctx = getCtx();
-    const now = ctx.currentTime;
-    // Rapid soft ticks simulating a drumroll
-    for (let i = 0; i < 30; i++) {
-      const t = now + i * 0.04;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'square';
-      osc.frequency.value = 200 + Math.random() * 100;
-      gain.gain.setValueAtTime(0.06, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
-      osc.start(t);
-      osc.stop(t + 0.03);
-    }
-  }, [getCtx]);
-
-  return { playTick, playFanfare, playDrumroll };
+  return { playTick, playFanfare };
 }

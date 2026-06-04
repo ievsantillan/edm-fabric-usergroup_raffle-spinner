@@ -7,24 +7,47 @@
 }
 
 :root {
-  --fabric-purple: #742774;
-  --fabric-purple-light: #9b4f9b;
-  --fabric-teal: #0078D4;
-  --fabric-teal-light: #2899f5;
-  --fabric-bg: #1B1A19;
-  --fabric-surface: #292827;
-  --fabric-surface-light: #3b3a39;
-  --fabric-text: #ffffff;
-  --fabric-text-secondary: #d2d0ce;
-  --fabric-text-muted: #979593;
-  --fabric-green: #107C10;
-  --fabric-gold: #FFB900;
-  --fabric-orange: #D83B01;
-  --fabric-border: #484644;
-  --fabric-glow: rgba(116, 39, 116, 0.5);
+  /* Global Fabric Community palette
+   * Sampled from https://globalfabric.community (deep navy bg + signature green accent)
+   * combined with the brand teal-greens from the Global Fabric Community logo. */
+  --gfc-bg:            #111022;  /* deep indigo/navy background */
+  --gfc-surface:       #1a1a30;  /* cards, panels */
+  --gfc-surface-light: #262544;  /* hovered surfaces */
+  --gfc-border:        #2e2d4d;  /* subtle dividers */
+
+  --gfc-green:         #2CF267;  /* primary CTA / accent — signature link color */
+  --gfc-green-soft:    #5af48a;
+  --gfc-teal:          #1b896c;  /* secondary — from logo */
+  --gfc-teal-dark:     #147966;  /* deeper teal — from logo outline */
+
+  --gfc-gold:          #FFB900;  /* winner accent (kept) */
+  --gfc-warn:          #ff6b6b;  /* errors */
+
+  --gfc-text:          #ffffff;
+  --gfc-text-secondary:#c8d0e6;
+  --gfc-text-muted:    #8a90b0;
+
+  /* Backwards-compatible aliases so existing App.css selectors still resolve.
+   * The names stay (fabric-purple, fabric-teal, etc.) but now point at the new palette. */
+  --fabric-purple:        var(--gfc-teal);
+  --fabric-purple-light:  var(--gfc-teal);
+  --fabric-teal:          var(--gfc-green);
+  --fabric-teal-light:    var(--gfc-green-soft);
+  --fabric-bg:            var(--gfc-bg);
+  --fabric-surface:       var(--gfc-surface);
+  --fabric-surface-light: var(--gfc-surface-light);
+  --fabric-text:          var(--gfc-text);
+  --fabric-text-secondary:var(--gfc-text-secondary);
+  --fabric-text-muted:    var(--gfc-text-muted);
+  --fabric-green:         var(--gfc-green);
+  --fabric-gold:          var(--gfc-gold);
+  --fabric-orange:        var(--gfc-warn);
+  --fabric-border:        var(--gfc-border);
+  --fabric-glow:          rgba(44, 242, 103, 0.45);
+
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: var(--fabric-text);
-  background-color: var(--fabric-bg);
+  color: var(--gfc-text);
+  background-color: var(--gfc-bg);
 }
 
 body {

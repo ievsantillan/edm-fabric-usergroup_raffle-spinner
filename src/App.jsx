@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import FileUpload from './components/FileUpload';
 import ColumnSelector from './components/ColumnSelector';
 import SlotMachine from './components/SlotMachine';
@@ -8,10 +8,27 @@ import { useRaffle } from './hooks/useRaffle';
 import { useAudio } from './hooks/useAudio';
 import './App.css';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENT METADATA — update these three values for each new event.
+// EVENT_DATE accepts any value Date can parse (ISO format recommended).
+// The header subtitle is rendered as: `{EVENT_TAGLINE} · {formatted EVENT_DATE}`.
+// ─────────────────────────────────────────────────────────────────────────────
+const EVENT_NAME = 'Edmonton Fabric User Group';
+const EVENT_TAGLINE = 'Global Fabric Day Raffle';
+const EVENT_DATE = '2026-06-27'; // YYYY-MM-DD
+
+const EVENT_DATE_LABEL = new Date(`${EVENT_DATE}T00:00:00`).toLocaleDateString(
+  'en-US',
+  { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }
+);
+const EVENT_SUBTITLE = `${EVENT_TAGLINE} · ${EVENT_DATE_LABEL}`;
+
 function App() {
   const [fileData, setFileData] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState('');
+  const [columnError, setColumnError] = useState(null);
   const [step, setStep] = useState('upload'); // upload | configure | ready
+  const slotRef = useRef(null);
 
   const {
     remainingParticipants,
@@ -19,8 +36,10 @@ function App() {
     currentWinner,
     isSpinning,
     showWinner,
+    sessionId,
     setIsSpinning,
     loadParticipants,
+    pickWinner,
     confirmWinner,
     dismissWinner,
     resetRaffle,
@@ -31,17 +50,26 @@ function App() {
   const handleFileParsed = useCallback((data) => {
     setFileData(data);
     setSelectedColumn('');
+    setColumnError(null);
     setStep('configure');
   }, []);
 
   const handleColumnSelect = useCallback(
     (col) => {
       setSelectedColumn(col);
-      if (col && fileData) {
-        const names = fileData.rows.map((row) => row[col]);
-        loadParticipants(names);
-        setStep('ready');
+      setColumnError(null);
+      if (!col || !fileData) return;
+      const names = fileData.rows
+        .map((row) => row[col])
+        .filter((n) => n && String(n).trim());
+      if (names.length === 0) {
+        setColumnError(
+          'No valid names found in this column. Pick a different column.'
+        );
+        return;
       }
+      loadParticipants(names);
+      setStep('ready');
     },
     [fileData, loadParticipants]
   );
@@ -66,11 +94,12 @@ function App() {
   const handleNewFile = useCallback(() => {
     setFileData(null);
     setSelectedColumn('');
+    setColumnError(null);
     setStep('upload');
     resetRaffle();
   }, [resetRaffle]);
 
-  // Spacebar to spin
+  // Spacebar to spin, Escape to dismiss winner overlay
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (
@@ -80,8 +109,19 @@ function App() {
         !showWinner &&
         remainingParticipants.length > 0
       ) {
+        // Ignore Space when focus is on an input/textarea/select/button (avoid hijacking native behaviour)
+        const target = e.target;
+        const tag = target?.tagName;
+        if (
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT' ||
+          tag === 'BUTTON'
+        ) {
+          return;
+        }
         e.preventDefault();
-        document.querySelector('.spin-button')?.click();
+        slotRef.current?.spin();
       }
       if (e.code === 'Escape' && showWinner) {
         dismissWinner();
@@ -97,14 +137,27 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <img
-            src="/edm_fabusergroup.png"
+            src={`${import.meta.env.BASE_URL}edm_fabusergroup.png`}
             alt="Edmonton Fabric Users Group"
             className="header-logo"
           />
-          <div>
-            <h1 className="header-title">Edmonton Fabric User Group</h1>
-            <p className="header-subtitle">Post FabCon Raffle &middot; Tuesday, Mar 31, 2026</p>
+          <div className="header-text">
+            <h1 className="header-title">{EVENT_NAME}</h1>
+            <p className="header-subtitle">{EVENT_SUBTITLE}</p>
           </div>
+          <a
+            className="header-logo-link"
+            href="https://globalfabric.community/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit the Global Fabric Community website"
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}global-fabric-community-logo.svg`}
+              alt="Global Fabric Community"
+              className="header-logo header-logo-right"
+            />
+          </a>
         </div>
       </header>
 
@@ -134,6 +187,11 @@ function App() {
                 selectedColumn={selectedColumn}
                 onSelect={handleColumnSelect}
               />
+              {columnError && (
+                <p className="error-message" role="alert">
+                  {columnError}
+                </p>
+              )}
             </div>
           )}
 
@@ -150,10 +208,13 @@ function App() {
               </div>
 
               <SlotMachine
+                ref={slotRef}
+                key={sessionId}
                 participants={remainingParticipants}
                 isSpinning={isSpinning}
                 onSpinStart={handleSpinStart}
                 onSpinEnd={handleSpinEnd}
+                pickWinner={pickWinner}
                 playTick={playTick}
                 disabled={showWinner}
               />
