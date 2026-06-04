@@ -5,6 +5,8 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 <p align="center">
   <img src="public/edm-fabric-usergroup-raffle-spinner_main.png" alt="Raffle Spinner - Main Screen" width="600" />
   <br />
+  <img src="public/edm-fabric-usergroup-raffle-spinner_spinner.png" alt="Raffle Spinner - Spinner Loaded" width="600" />
+  <br />
   <img src="public/edm-fabric-usergroup-raffle-spinner_winner.png" alt="Raffle Spinner - Winner Screen" width="600" />
 </p>
 
