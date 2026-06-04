@@ -7,7 +7,7 @@
 
 .app-header {
   background: linear-gradient(135deg, var(--gfc-bg) 0%, var(--gfc-teal-dark) 50%, var(--gfc-teal) 100%);
-  padding: 20px 40px;
+  padding: 20px clamp(16px, 3vw, 40px);
   border-bottom: 1px solid var(--fabric-border);
 }
 
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -66,11 +66,11 @@
 .app-main {
   flex: 1;
   display: flex;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
-  padding: 40px;
-  gap: 40px;
+  padding: clamp(20px, 3vw, 40px);
+  gap: clamp(20px, 2.5vw, 40px);
 }
 
 .main-content {
@@ -78,19 +78,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
 }
 
 .sidebar {
-  width: 280px;
+  width: clamp(240px, 22vw, 340px);
   flex-shrink: 0;
 }
 
 /* ===== STEPS ===== */
 .upload-step,
-.configure-step,
-.ready-step {
+.configure-step {
   width: 100%;
   max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ready-step {
+  width: 100%;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -314,7 +322,7 @@
 /* ===== PRIZE BANNER (ready step) ===== */
 .prize-banner {
   width: 100%;
-  max-width: 520px;
+  max-width: clamp(320px, 55vw, 720px);
   margin: 0 auto 24px;
   padding: 14px 20px;
   border-radius: 12px;
@@ -385,7 +393,7 @@
 .slot-machine {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: clamp(320px, 55vw, 720px);
   border: 2px solid var(--fabric-border);
   border-radius: 16px;
   overflow: hidden;
