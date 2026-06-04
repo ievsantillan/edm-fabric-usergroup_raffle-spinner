@@ -195,6 +195,98 @@
   border-color: var(--fabric-teal);
 }
 
+/* ===== PRIZES INPUT (configure step) ===== */
+.prizes-field {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.prizes-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--fabric-text);
+}
+
+.prizes-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fabric-text-muted);
+  line-height: 1.4;
+}
+
+.prizes-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--fabric-border);
+  background: var(--fabric-surface);
+  color: var(--fabric-text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 92px;
+  transition: border-color 0.2s;
+}
+
+.prizes-input:hover,
+.prizes-input:focus {
+  border-color: var(--fabric-teal);
+  outline: none;
+}
+
+.prizes-input::placeholder {
+  color: var(--fabric-text-muted);
+  opacity: 0.7;
+}
+
+/* ===== PRIZE BANNER (ready step) ===== */
+.prize-banner {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 24px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 185, 0, 0.12), rgba(44, 242, 103, 0.10));
+  border: 1px solid rgba(255, 185, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.prize-banner-progress {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--fabric-text-muted);
+  font-weight: 600;
+}
+
+.prize-banner-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fabric-gold);
+  line-height: 1.2;
+}
+
+.prize-banner--done {
+  background: linear-gradient(135deg, rgba(44, 242, 103, 0.18), rgba(27, 137, 108, 0.14));
+  border-color: rgba(44, 242, 103, 0.45);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gfc-green);
+  padding: 16px 20px;
+}
+
 /* ===== PARTICIPANT COUNT ===== */
 .participant-count {
   display: flex;
@@ -434,6 +526,22 @@
   animation: slide-in 0.3s ease;
 }
 
+.history-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.history-prize {
+  font-size: 12px;
+  color: var(--fabric-gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .history-item:last-child {
   border-bottom: none;
 }
@@ -510,6 +618,19 @@
   font-size: 72px;
   margin-bottom: 16px;
   animation: bounce 0.6s ease infinite alternate;
+}
+
+.winner-prize {
+  display: inline-block;
+  margin: 0 auto 12px;
+  padding: 6px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fabric-gold);
+  background: rgba(255, 185, 0, 0.12);
+  border: 1px solid rgba(255, 185, 0, 0.4);
+  border-radius: 999px;
+  letter-spacing: 0.5px;
 }
 
 @keyframes bounce {

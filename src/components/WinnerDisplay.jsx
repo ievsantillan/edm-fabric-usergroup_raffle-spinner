@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
-export default function WinnerDisplay({ winner, show, onDismiss, drawNumber }) {
+export default function WinnerDisplay({ winner, prize, show, onDismiss, drawNumber }) {
   const confettiFired = useRef(false);
   const dismissBtnRef = useRef(null);
   const labelId = 'winner-label';
@@ -78,8 +78,13 @@ export default function WinnerDisplay({ winner, show, onDismiss, drawNumber }) {
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
           >
             <div className="winner-trophy" aria-hidden="true">🏆</div>
+            {prize ? (
+              <p className="winner-prize" aria-label={`Prize: ${prize}`}>
+                <span aria-hidden="true">🎁</span> {prize}
+              </p>
+            ) : null}
             <h2 id={labelId} className="winner-label">
-              Winner #{drawNumber}!
+              {prize ? 'Goes to' : `Winner #${drawNumber}!`}
             </h2>
             <h1 id={nameId} className="winner-name" aria-live="polite">
               {winner}

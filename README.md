@@ -120,11 +120,12 @@ Color variables live in [`src/index.css`](src/index.css) under `:root` (the `--g
 ## Usage
 
 1. **Upload a file** — Drag and drop (or click to browse) a `.csv` or `.xlsx` file containing participant names.
-2. **Select the name column** — If the file has multiple columns, pick the one that contains participant names.
-3. **Spin!** — Click the **SPIN** button or press `Space` to draw a winner.
-4. **Celebrate** — The winner is revealed with confetti and a fanfare sound effect.
-5. **Draw again** — Click **Continue** (or press `Escape`), then spin again. Previous winners are automatically removed from the pool.
-6. **Reset** — Click **Reset Raffle** to put all participants back in the pool, or **Load New File** to start over with a different file.
+2. **(Optional) Add prize labels** — On the Configure screen, paste one prize per line into the **Prizes** textarea. Winners will be drawn in that order and each will be labelled with the prize they receive. Leave the box empty for a generic raffle (winners are simply numbered `#1`, `#2`, …).
+3. **Select the name column** — If the file has multiple columns, pick the one that contains participant names.
+4. **Spin!** — Click the **SPIN** button or press `Space` to draw a winner. When prize mode is on, the next prize is shown above the spinner.
+5. **Celebrate** — The winner is revealed with confetti, a fanfare sound, and (if configured) the prize they've won.
+6. **Draw again** — Click **Continue** (or press `Escape`), then spin again. Previous winners are automatically removed from the pool.
+7. **Wrap up** — Once every prize has been awarded, the SPIN button is replaced with an "All prizes have been awarded!" banner. Click **Reset Raffle** to put participants back in the pool, or **Load New File** to start over.
 
 A sample file is included at `public/test-participants.csv` for testing.
 

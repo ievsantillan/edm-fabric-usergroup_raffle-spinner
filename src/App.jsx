@@ -27,6 +27,7 @@ function App() {
   const [fileData, setFileData] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState('');
   const [columnError, setColumnError] = useState(null);
+  const [prizesText, setPrizesText] = useState('');
   const [step, setStep] = useState('upload'); // upload | configure | ready
   const slotRef = useRef(null);
 
@@ -34,10 +35,14 @@ function App() {
     remainingParticipants,
     winners,
     currentWinner,
+    currentPrize,
+    allPrizesAwarded,
+    prizeProgress,
     isSpinning,
     showWinner,
     sessionId,
     setIsSpinning,
+    setPrizes,
     loadParticipants,
     pickWinner,
     confirmWinner,
@@ -68,10 +73,17 @@ function App() {
         );
         return;
       }
+      // Parse the (optional) prize list: one prize per line. Blank lines are
+      // dropped inside useRaffle.setPrizes — we just need to split here.
+      const prizeList = prizesText
+        .split(/\r?\n/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      setPrizes(prizeList);
       loadParticipants(names);
       setStep('ready');
     },
-    [fileData, loadParticipants]
+    [fileData, loadParticipants, prizesText, setPrizes]
   );
 
   const handleSpinStart = useCallback(() => {
@@ -95,9 +107,11 @@ function App() {
     setFileData(null);
     setSelectedColumn('');
     setColumnError(null);
+    setPrizesText('');
+    setPrizes([]);
     setStep('upload');
     resetRaffle();
-  }, [resetRaffle]);
+  }, [resetRaffle, setPrizes]);
 
   // Spacebar to spin, Escape to dismiss winner overlay
   useEffect(() => {
@@ -107,6 +121,7 @@ function App() {
         step === 'ready' &&
         !isSpinning &&
         !showWinner &&
+        !allPrizesAwarded &&
         remainingParticipants.length > 0
       ) {
         // Ignore Space when focus is on an input/textarea/select/button (avoid hijacking native behaviour)
@@ -129,7 +144,14 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [step, isSpinning, showWinner, remainingParticipants.length, dismissWinner]);
+  }, [
+    step,
+    isSpinning,
+    showWinner,
+    allPrizesAwarded,
+    remainingParticipants.length,
+    dismissWinner,
+  ]);
 
   return (
     <div className="app">
@@ -182,6 +204,26 @@ function App() {
                 <strong>{fileData.columns.length}</strong> columns. Select the
                 column containing participant names.
               </p>
+
+              <div className="prizes-field">
+                <label htmlFor="prizes-input" className="prizes-label">
+                  <span>🎁 Prizes (optional)</span>
+                  <span className="prizes-hint">
+                    One prize per line — winners are drawn in order. Leave blank
+                    for a generic raffle.
+                  </span>
+                </label>
+                <textarea
+                  id="prizes-input"
+                  className="prizes-input"
+                  value={prizesText}
+                  onChange={(e) => setPrizesText(e.target.value)}
+                  placeholder={'Grand prize: Surface Pro\nXbox Series X\n$50 gift card'}
+                  rows={4}
+                  spellCheck={false}
+                />
+              </div>
+
               <ColumnSelector
                 columns={fileData.columns}
                 selectedColumn={selectedColumn}
@@ -207,6 +249,24 @@ function App() {
                 </span>
               </div>
 
+              {currentPrize && !allPrizesAwarded && (
+                <div className="prize-banner" aria-live="polite">
+                  <span className="prize-banner-progress">
+                    Prize {prizeProgress.current} of {prizeProgress.total}
+                  </span>
+                  <span className="prize-banner-name">
+                    <span aria-hidden="true">🎁</span> {currentPrize}
+                  </span>
+                </div>
+              )}
+
+              {allPrizesAwarded && (
+                <div className="prize-banner prize-banner--done" role="status">
+                  <span aria-hidden="true">🎉</span> All {prizeProgress.total}{' '}
+                  prizes have been awarded!
+                </div>
+              )}
+
               <SlotMachine
                 ref={slotRef}
                 key={sessionId}
@@ -216,7 +276,7 @@ function App() {
                 onSpinEnd={handleSpinEnd}
                 pickWinner={pickWinner}
                 playTick={playTick}
-                disabled={showWinner}
+                disabled={showWinner || allPrizesAwarded}
               />
 
               <div className="controls-bar">
@@ -252,6 +312,7 @@ function App() {
       {/* Winner celebration overlay */}
       <WinnerDisplay
         winner={currentWinner}
+        prize={winners[winners.length - 1]?.prize ?? null}
         show={showWinner}
         onDismiss={dismissWinner}
         drawNumber={winners.length}
