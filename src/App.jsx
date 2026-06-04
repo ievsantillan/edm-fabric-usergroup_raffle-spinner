@@ -205,13 +205,14 @@ function App() {
                 column containing participant names.
               </p>
 
-              <div className="prizes-field">
-                <label htmlFor="prizes-input" className="prizes-label">
-                  <span>🎁 Prizes (optional)</span>
-                  <span className="prizes-hint">
-                    One prize per line — winners are drawn in order. Leave blank
-                    for a generic raffle.
-                  </span>
+              <details className="prizes-field">
+                <summary className="prizes-summary">
+                  <span className="prizes-summary-title">🎁 Award specific prizes?</span>
+                  <span className="prizes-summary-hint">optional</span>
+                </summary>
+                <label htmlFor="prizes-input" className="prizes-hint prizes-hint--inset">
+                  One prize per line — winners are drawn in order. Leave blank
+                  for a generic raffle.
                 </label>
                 <textarea
                   id="prizes-input"
@@ -222,7 +223,7 @@ function App() {
                   rows={4}
                   spellCheck={false}
                 />
-              </div>
+              </details>
 
               <ColumnSelector
                 columns={fileData.columns}

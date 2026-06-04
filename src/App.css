@@ -199,10 +199,67 @@
 .prizes-field {
   width: 100%;
   max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   margin-bottom: 20px;
+  border: 1px solid var(--fabric-border);
+  border-radius: 8px;
+  background: var(--fabric-surface);
+  overflow: hidden;
+}
+
+.prizes-field[open] {
+  border-color: var(--fabric-teal);
+}
+
+.prizes-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fabric-text);
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.prizes-summary::-webkit-details-marker {
+  display: none;
+}
+
+.prizes-summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--fabric-text-muted);
+  transition: transform 0.2s;
+}
+
+.prizes-field[open] .prizes-summary::before {
+  transform: rotate(90deg);
+}
+
+.prizes-summary:hover {
+  background: var(--fabric-surface-light);
+}
+
+.prizes-summary:focus-visible {
+  outline: 2px solid var(--gfc-green);
+  outline-offset: -2px;
+}
+
+.prizes-summary-title {
+  flex: 1;
+}
+
+.prizes-summary-hint {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--fabric-text-muted);
 }
 
 .prizes-label {
@@ -221,12 +278,18 @@
   line-height: 1.4;
 }
 
+.prizes-hint--inset {
+  display: block;
+  padding: 0 14px 8px;
+}
+
 .prizes-input {
-  width: 100%;
+  width: calc(100% - 28px);
+  margin: 0 14px 14px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--fabric-border);
-  background: var(--fabric-surface);
+  background: var(--fabric-bg);
   color: var(--fabric-text);
   font-family: inherit;
   font-size: 14px;
@@ -234,6 +297,7 @@
   resize: vertical;
   min-height: 92px;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .prizes-input:hover,
