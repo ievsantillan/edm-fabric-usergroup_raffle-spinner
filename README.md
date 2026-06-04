@@ -102,6 +102,28 @@ const EVENT_DATE    = '2026-06-27'; // YYYY-MM-DD
 
 The header subtitle is composed as: **`{EVENT_TAGLINE} · {formatted EVENT_DATE}`**.
 
+### Setting up prizes (per draw, no code changes)
+
+Prizes are entered **in the app itself** every time you run a raffle — there is no constant to edit. This keeps the same build reusable across events.
+
+1. Start the app (`npm run dev` for local, or open your deployed URL).
+2. Upload your participants CSV/Excel.
+3. On the **Configure** screen you'll see a **🎁 Prizes (optional)** textarea right above the column selector.
+4. Paste one prize per line, **in the order you want to award them**, for example:
+
+   ```text
+   Grand prize: Surface Pro 11
+   Xbox Series X
+   $100 Microsoft Store gift card
+   ```
+
+5. Pick the name column. The app jumps to the spinner with a **"Prize 1 of N"** banner showing the first prize.
+6. Each spin advances to the next prize. After the last one, the SPIN button is locked and a **"🎉 All N prizes have been awarded!"** banner appears.
+
+Leave the textarea empty for a generic raffle — winners are simply numbered `#1`, `#2`, `#3`, … with no prize labels.
+
+> Tip — running the same prize list at a recurring event? Keep it in a `prizes.txt` file in your event-day folder and paste it into the textarea each time. (A future enhancement could load this from a file; today it's manual.)
+
 ### Changing logos
 
 The header shows two logos sourced from `public/`:
@@ -120,7 +142,7 @@ Color variables live in [`src/index.css`](src/index.css) under `:root` (the `--g
 ## Usage
 
 1. **Upload a file** — Drag and drop (or click to browse) a `.csv` or `.xlsx` file containing participant names.
-2. **(Optional) Add prize labels** — On the Configure screen, paste one prize per line into the **Prizes** textarea. Winners will be drawn in that order and each will be labelled with the prize they receive. Leave the box empty for a generic raffle (winners are simply numbered `#1`, `#2`, …).
+2. **(Optional) Add prize labels** — On the Configure screen, paste one prize per line into the **🎁 Prizes (optional)** textarea (above the column selector). Winners are drawn in that order and each is labelled with the prize they receive. Leave the box empty for a generic raffle (winners are simply numbered `#1`, `#2`, …). See [Setting up prizes](#setting-up-prizes-per-draw-no-code-changes) for examples.
 3. **Select the name column** — If the file has multiple columns, pick the one that contains participant names.
 4. **Spin!** — Click the **SPIN** button or press `Space` to draw a winner. When prize mode is on, the next prize is shown above the spinner.
 5. **Celebrate** — The winner is revealed with confetti, a fanfare sound, and (if configured) the prize they've won.
