@@ -549,6 +549,36 @@
   background: var(--fabric-surface-light);
 }
 
+/* ===== KEYBOARD SHORTCUTS HINT ===== */
+.shortcuts-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--fabric-text-muted);
+}
+
+.shortcuts-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  margin-right: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--fabric-text);
+  background: var(--fabric-surface-light);
+  border: 1px solid var(--fabric-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+}
+
+.shortcuts-sep {
+  opacity: 0.5;
+}
+
 /* ===== WINNER HISTORY ===== */
 .winner-history {
   background: var(--fabric-surface);
@@ -562,11 +592,19 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  gap: 8px;
 }
 
 .history-header h3 {
   font-size: 18px;
   font-weight: 600;
+}
+
+.history-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .reset-button {

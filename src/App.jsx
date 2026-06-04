@@ -6,6 +6,7 @@ import WinnerDisplay from './components/WinnerDisplay';
 import WinnerHistory from './components/WinnerHistory';
 import { useRaffle } from './hooks/useRaffle';
 import { useAudio } from './hooks/useAudio';
+import { exportWinnersCsv } from './utils/exportWinners';
 import './App.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -103,6 +104,10 @@ function App() {
     resetRaffle();
   }, [resetRaffle]);
 
+  const handleExport = useCallback(() => {
+    exportWinnersCsv(winners, { eventName: EVENT_NAME, eventDate: EVENT_DATE });
+  }, [winners]);
+
   const handleNewFile = useCallback(() => {
     setFileData(null);
     setSelectedColumn('');
@@ -113,9 +118,34 @@ function App() {
     resetRaffle();
   }, [resetRaffle, setPrizes]);
 
-  // Spacebar to spin, Escape to dismiss winner overlay
+  // Keyboard shortcuts for stage use:
+  //   Space  → spin (when ready, idle, no overlay, pool & prizes remain)
+  //   Esc    → dismiss the winner overlay
+  //   R      → reset raffle (only on ready step, idle, with at least one winner)
+  //   E      → export winners to CSV (only with at least one winner)
+  // Shortcuts are ignored while focus is on an interactive form element so we
+  // don't hijack typing in the prize textarea or column selector.
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const target = e.target;
+      const tag = target?.tagName;
+      const typingInFormField =
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        target?.isContentEditable;
+
+      // Esc works even when a button is focused (e.g. the winner overlay's Continue button).
+      if (e.code === 'Escape' && showWinner) {
+        dismissWinner();
+        return;
+      }
+
+      // The remaining shortcuts are letter/space keys — skip if the user is typing.
+      if (typingInFormField) return;
+      // Also skip when a button has focus so Space/Enter on that button still works natively.
+      if (tag === 'BUTTON' && (e.code === 'Space' || e.code === 'Enter')) return;
+
       if (
         e.code === 'Space' &&
         step === 'ready' &&
@@ -124,22 +154,32 @@ function App() {
         !allPrizesAwarded &&
         remainingParticipants.length > 0
       ) {
-        // Ignore Space when focus is on an input/textarea/select/button (avoid hijacking native behaviour)
-        const target = e.target;
-        const tag = target?.tagName;
-        if (
-          tag === 'INPUT' ||
-          tag === 'TEXTAREA' ||
-          tag === 'SELECT' ||
-          tag === 'BUTTON'
-        ) {
-          return;
-        }
         e.preventDefault();
         slotRef.current?.spin();
+        return;
       }
-      if (e.code === 'Escape' && showWinner) {
-        dismissWinner();
+
+      if (
+        e.code === 'KeyR' &&
+        step === 'ready' &&
+        !isSpinning &&
+        !showWinner &&
+        winners.length > 0
+      ) {
+        e.preventDefault();
+        handleReset();
+        return;
+      }
+
+      if (
+        e.code === 'KeyE' &&
+        step === 'ready' &&
+        !isSpinning &&
+        !showWinner &&
+        winners.length > 0
+      ) {
+        e.preventDefault();
+        handleExport();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -150,7 +190,10 @@ function App() {
     showWinner,
     allPrizesAwarded,
     remainingParticipants.length,
+    winners.length,
     dismissWinner,
+    handleReset,
+    handleExport,
   ]);
 
   return (
@@ -285,10 +328,34 @@ function App() {
                   📂 Load New File
                 </button>
                 {winners.length > 0 && (
-                  <button className="secondary-button" onClick={handleReset}>
-                    ↺ Reset Raffle
-                  </button>
+                  <>
+                    <button
+                      className="secondary-button"
+                      onClick={handleExport}
+                      title="Download winners as CSV"
+                      aria-keyshortcuts="E"
+                    >
+                      📥 Export Winners
+                    </button>
+                    <button
+                      className="secondary-button"
+                      onClick={handleReset}
+                      aria-keyshortcuts="R"
+                    >
+                      ↺ Reset Raffle
+                    </button>
+                  </>
                 )}
+              </div>
+
+              <div className="shortcuts-hint" aria-label="Keyboard shortcuts">
+                <kbd>Space</kbd> spin
+                <span className="shortcuts-sep" aria-hidden="true">·</span>
+                <kbd>Esc</kbd> dismiss
+                <span className="shortcuts-sep" aria-hidden="true">·</span>
+                <kbd>R</kbd> reset
+                <span className="shortcuts-sep" aria-hidden="true">·</span>
+                <kbd>E</kbd> export
               </div>
             </div>
           )}
@@ -297,7 +364,11 @@ function App() {
         {/* Right side: winner history */}
         {step === 'ready' && (
           <aside className="sidebar">
-            <WinnerHistory winners={winners} onReset={handleReset} />
+            <WinnerHistory
+              winners={winners}
+              onReset={handleReset}
+              onExport={handleExport}
+            />
             {winners.length === 0 && (
               <div className="sidebar-empty">
                 <p>No winners yet.</p>

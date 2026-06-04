@@ -23,8 +23,9 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **Confetti celebration** — Multi-burst confetti explosion when a winner is drawn
 - **CSV & Excel support** — Upload `.csv`, `.xlsx`, or `.xls` files; pick which column contains names
 - **Multi-winner draws** — Previous winners are removed from the pool automatically
-- **Winner history sidebar** — Track all drawn winners in order
-- **Keyboard shortcuts** — `Space` to spin, `Escape` to dismiss the winner overlay
+- **Winner history sidebar** — Track all drawn winners in order, with one-click CSV export
+- **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `R` to reset, `E` to export winners to CSV
+- **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM) for post-event fulfillment & sponsor reporting
 - **Global Fabric Community themed** — Dark navy UI with signature green accents and gold winner highlights
 - **Fully client-side** — No backend or server required; runs entirely in the browser
 
@@ -147,7 +148,31 @@ Color variables live in [`src/index.css`](src/index.css) under `:root` (the `--g
 4. **Spin!** — Click the **SPIN** button or press `Space` to draw a winner. When prize mode is on, the next prize is shown above the spinner.
 5. **Celebrate** — The winner is revealed with confetti, a fanfare sound, and (if configured) the prize they've won.
 6. **Draw again** — Click **Continue** (or press `Escape`), then spin again. Previous winners are automatically removed from the pool.
-7. **Wrap up** — Once every prize has been awarded, the SPIN button is replaced with an "All prizes have been awarded!" banner. Click **Reset Raffle** to put participants back in the pool, or **Load New File** to start over.
+7. **Wrap up** — Once every prize has been awarded, the SPIN button is replaced with an "All prizes have been awarded!" banner. Click **📥 Export Winners** (or press `E`) to download the winner list as a CSV, then **Reset Raffle** to put participants back in the pool, or **Load New File** to start over.
+
+### Keyboard shortcuts (stage use)
+
+Designed for one-handed presenter use — no clicking needed once the spinner is loaded.
+
+| Key | Action | Available when |
+|---|---|---|
+| `Space` | Spin the wheel | On the spinner screen, idle, with participants & prizes remaining |
+| `Esc` | Dismiss the winner overlay | While the winner card is visible |
+| `R` | Reset raffle (returns all winners to the pool) | At least one winner drawn |
+| `E` | Export winners to CSV | At least one winner drawn |
+
+Shortcuts are ignored while typing in the prize textarea or column selector, so they won't hijack data entry.
+
+### CSV export format
+
+The **📥 Export Winners** button (and the `E` shortcut) downloads a file named `<event-slug>-winners-<event-date>.csv` with columns:
+
+| `#` | `Name` | `Prize` | `Exported at` |
+|---|---|---|---|
+| 1 | Svetlana Soldatov | Grand prize: Surface Pro 11 | 2026-06-27T19:30:00.000Z |
+| 2 | Bennet Steem | Xbox Series X | 2026-06-27T19:34:12.000Z |
+
+The file is UTF-8 with a BOM so Excel renders accented names correctly, and embedded commas/quotes/newlines in names are properly escaped.
 
 A sample file is included at `public/test-participants.csv` for testing.
 

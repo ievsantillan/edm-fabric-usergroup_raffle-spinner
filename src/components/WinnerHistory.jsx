@@ -1,13 +1,25 @@
-export default function WinnerHistory({ winners, onReset }) {
+export default function WinnerHistory({ winners, onReset, onExport }) {
   if (winners.length === 0) return null;
 
   return (
     <div className="winner-history">
       <div className="history-header">
         <h3>🏆 Winners</h3>
-        <button className="reset-button" onClick={onReset} title="Reset raffle">
-          ↺ Reset
-        </button>
+        <div className="history-actions">
+          {onExport && (
+            <button
+              className="reset-button"
+              onClick={onExport}
+              title="Export winners to CSV (E)"
+              aria-keyshortcuts="E"
+            >
+              📥 Export
+            </button>
+          )}
+          <button className="reset-button" onClick={onReset} title="Reset raffle (R)" aria-keyshortcuts="R">
+            ↺ Reset
+          </button>
+        </div>
       </div>
       <ul className="history-list">
         {winners.map((w, i) => (
