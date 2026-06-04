@@ -7,6 +7,7 @@ import WinnerHistory from './components/WinnerHistory';
 import { useRaffle } from './hooks/useRaffle';
 import { useAudio } from './hooks/useAudio';
 import { exportWinnersCsv } from './utils/exportWinners';
+import { clearAll as clearAllStorage, loadJson, saveJson } from './utils/storage';
 import './App.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -24,15 +25,24 @@ const EVENT_DATE_LABEL = new Date(`${EVENT_DATE}T00:00:00`).toLocaleDateString(
 );
 const EVENT_SUBTITLE = `${EVENT_TAGLINE} · ${EVENT_DATE_LABEL}`;
 
+// localStorage keys (read/written via utils/storage which version-namespaces them).
+// useRaffle owns the raffle data slice; App owns these lightweight UI inputs.
+const PRIZES_TEXT_KEY = 'prizesText';
+
 function App() {
   const [fileData, setFileData] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState('');
   const [columnError, setColumnError] = useState(null);
-  const [prizesText, setPrizesText] = useState('');
+  // Lazy initializer so we only hit localStorage once on mount.
+  const [prizesText, setPrizesText] = useState(() => loadJson(PRIZES_TEXT_KEY, ''));
   const [step, setStep] = useState('upload'); // upload | configure | ready
+  // True only on this very first render if we found a restored raffle in
+  // progress. Lets us show the "Restored from earlier session" banner.
+  const [showRestoredBanner, setShowRestoredBanner] = useState(false);
   const slotRef = useRef(null);
 
   const {
+    allParticipants,
     remainingParticipants,
     winners,
     currentWinner,
@@ -49,14 +59,33 @@ function App() {
     confirmWinner,
     dismissWinner,
     resetRaffle,
+    clearAll: clearRaffleState,
   } = useRaffle();
 
   const { playTick, playFanfare } = useAudio();
+
+  // On first mount, if useRaffle restored an in-progress raffle from
+  // localStorage, jump straight to the ready step and surface a banner so the
+  // user knows their previous state was recovered. Runs once.
+  useEffect(() => {
+    if (allParticipants.length > 0) {
+      setStep('ready');
+      setShowRestoredBanner(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist prizesText whenever it changes so the textarea round-trips a
+  // refresh. useRaffle handles its own slice independently.
+  useEffect(() => {
+    saveJson(PRIZES_TEXT_KEY, prizesText);
+  }, [prizesText]);
 
   const handleFileParsed = useCallback((data) => {
     setFileData(data);
     setSelectedColumn('');
     setColumnError(null);
+    setShowRestoredBanner(false);
     setStep('configure');
   }, []);
 
@@ -82,6 +111,7 @@ function App() {
         .filter(Boolean);
       setPrizes(prizeList);
       loadParticipants(names);
+      setShowRestoredBanner(false);
       setStep('ready');
     },
     [fileData, loadParticipants, prizesText, setPrizes]
@@ -113,10 +143,25 @@ function App() {
     setSelectedColumn('');
     setColumnError(null);
     setPrizesText('');
-    setPrizes([]);
+    setShowRestoredBanner(false);
+    clearRaffleState();
+    clearAllStorage();
     setStep('upload');
-    resetRaffle();
-  }, [resetRaffle, setPrizes]);
+  }, [clearRaffleState]);
+
+  // Same as Load New File but with a confirm() prompt because it can't be
+  // undone — used by the restored-session banner's "Start fresh" button.
+  const handleStartFresh = useCallback(() => {
+    const ok = window.confirm(
+      'Start fresh? This will discard the restored raffle (participants, prizes, and winners) and return to the upload screen.'
+    );
+    if (!ok) return;
+    handleNewFile();
+  }, [handleNewFile]);
+
+  const dismissRestoredBanner = useCallback(() => {
+    setShowRestoredBanner(false);
+  }, []);
 
   // Keyboard shortcuts for stage use:
   //   Space  → spin (when ready, idle, no overlay, pool & prizes remain)
@@ -283,6 +328,35 @@ function App() {
 
           {step === 'ready' && (
             <div className="ready-step">
+              {showRestoredBanner && (
+                <div className="restored-banner" role="status">
+                  <span className="restored-banner-icon" aria-hidden="true">📂</span>
+                  <span className="restored-banner-text">
+                    Restored your previous raffle —{' '}
+                    <strong>{allParticipants.length}</strong> participant
+                    {allParticipants.length !== 1 ? 's' : ''},{' '}
+                    <strong>{winners.length}</strong> winner
+                    {winners.length !== 1 ? 's' : ''} drawn.
+                  </span>
+                  <button
+                    type="button"
+                    className="restored-banner-action"
+                    onClick={handleStartFresh}
+                  >
+                    Start fresh
+                  </button>
+                  <button
+                    type="button"
+                    className="restored-banner-dismiss"
+                    onClick={dismissRestoredBanner}
+                    aria-label="Dismiss restored session notice"
+                    title="Dismiss"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
               <div className="participant-count">
                 <span className="count-number">
                   {remainingParticipants.length}

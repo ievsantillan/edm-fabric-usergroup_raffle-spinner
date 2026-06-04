@@ -26,6 +26,7 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **Winner history sidebar** — Track all drawn winners in order, with one-click CSV export
 - **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `R` to reset, `E` to export winners to CSV
 - **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM) for post-event fulfillment & sponsor reporting
+- **Crash-safe — your raffle survives a refresh** — Participants, prizes, and winners are saved to `localStorage` after every change. Accidentally close the tab or the laptop goes to sleep? Reopen and continue exactly where you left off, with a restored-session banner so you know what happened.
 - **Global Fabric Community themed** — Dark navy UI with signature green accents and gold winner highlights
 - **Fully client-side** — No backend or server required; runs entirely in the browser
 
@@ -173,6 +174,23 @@ The **📥 Export Winners** button (and the `E` shortcut) downloads a file named
 | 2 | Bennet Steem | Xbox Series X | 2026-06-27T19:34:12.000Z |
 
 The file is UTF-8 with a BOM so Excel renders accented names correctly, and embedded commas/quotes/newlines in names are properly escaped.
+
+### Crash-safety / refresh-safety
+
+The raffle's state — participants, prizes already awarded, and the prize textarea contents — is automatically saved to your browser's `localStorage` after every change. If the tab closes, the laptop sleeps, or you accidentally hit refresh, reopening the page will:
+
+1. Skip the upload + configure screens and land you directly on the spinner.
+2. Show a green banner: *“Restored your previous raffle — **N** participants, **M** winners drawn.”*
+3. Resume on the correct prize in the sequence (e.g. “Prize 3 of 5” if two prizes had already been drawn).
+
+The banner has two actions:
+
+- **Start fresh** — confirms, then wipes participants/prizes/winners and returns you to the upload screen. Use this when you're starting a brand-new raffle and don't want to re-use the previous data.
+- **✕** — dismisses the banner only. Your raffle continues.
+
+The **📂 Load New File** button on the spinner screen also clears the persisted state — it always returns you to a clean upload.
+
+**Privacy note:** participant data sits in your browser's storage until you clear it (via Start fresh, Load New File, or your browser's site-data tools). Persistence is per-browser and per-device — nothing is sent to a server.
 
 A sample file is included at `public/test-participants.csv` for testing.
 
