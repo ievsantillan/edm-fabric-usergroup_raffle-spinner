@@ -3,11 +3,11 @@
 A visually appealing slot-machine-style raffle spinner built for the Edmonton Fabric User Group. Upload a CSV or Excel file of participants, pick the name column, and spin to draw winners — complete with sound effects, confetti, and a color scheme inspired by the [Global Fabric Community](https://globalfabric.community/).
 
 <p align="center">
-  <img src="public/edm-fabric-usergroup-raffle-spinner_main.png" alt="Raffle Spinner - Main Screen" width="600" />
-  <br />
-  <img src="public/edm-fabric-usergroup-raffle-spinner_spinner.png" alt="Raffle Spinner - Spinner Loaded" width="600" />
-  <br />
-  <img src="public/edm-fabric-usergroup-raffle-spinner_winner.png" alt="Raffle Spinner - Winner Screen" width="600" />
+  <img src="public/edm-fabric-usergroup-raffle-spinner_main.png" alt="Raffle Spinner - Main Screen" width="240" />
+  &nbsp;
+  <img src="public/edm-fabric-usergroup-raffle-spinner_spinner.png" alt="Raffle Spinner - Spinner Loaded" width="240" />
+  &nbsp;
+  <img src="public/edm-fabric-usergroup-raffle-spinner_winner.png" alt="Raffle Spinner - Winner Screen" width="240" />
 </p>
 
 [![Deploy to GitHub Pages](https://github.com/ievsantillan/edm-fabric-usergroup_raffle-spinner/actions/workflows/deploy.yml/badge.svg)](https://github.com/ievsantillan/edm-fabric-usergroup_raffle-spinner/actions/workflows/deploy.yml)
