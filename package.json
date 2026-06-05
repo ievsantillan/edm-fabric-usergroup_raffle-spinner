@@ -14,15 +14,15 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
-    "framer-motion": "^12.38.0",
+    "framer-motion": "^12.40.0",
     "papaparse": "^5.5.3",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "read-excel-file": "^9.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
