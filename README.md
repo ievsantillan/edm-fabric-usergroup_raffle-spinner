@@ -39,9 +39,35 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 
 ---
 
+## 🎁 Use this template (for other Fabric user groups)
+
+This repository is published as a GitHub **template**, so you can run your own
+group's raffle without forking history. Steps:
+
+1. Click **"Use this template" → Create a new repository** at the top of this
+   repo's GitHub page.
+2. Clone your new repo and run the steps in [Getting Started](#getting-started).
+3. **Customize for your group** — these are the only places that hard-code
+   "Edmonton Fabric User Group":
+   - **`src/eventConfig.js`** — three constants: `EVENT_NAME`, `EVENT_TAGLINE`, `EVENT_DATE`.
+   - **`index.html`** — `<title>`, `<meta name="description">`, and the Open Graph / Twitter Card tags.
+   - **`README.md`** — title, intro line, badge URLs (the deploy badge points at this repo by default; the GitHub Actions workflow will work in your copy automatically once you push to `main`).
+   - **`public/`** — replace the screenshots and (optionally) `edm_fabusergroup.png` / `favicon.svg` with your group's branding.
+   - **`SECURITY.md`** — update the deployed-site URL and the private vulnerability reporting link to point at your new repo.
+4. **Enable GitHub Pages** in your new repo: **Settings → Pages → Source:** *GitHub Actions*. The first push to `main` deploys automatically.
+
+Optional but recommended: run `scripts/capture-screenshots.mjs` after your
+customizations to regenerate the README screenshots from your new branding.
+
+> **Note on `BASE_PATH`:** the deploy workflow derives the GitHub Pages
+> sub-path from `${{ github.event.repository.name }}`, so renaming the repo
+> "just works" — no edit required.
+
+---
+
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or later (LTS recommended)
+- [Node.js](https://nodejs.org/) v20 or later (LTS recommended). The repo's `.nvmrc` pins v22.
 - npm (included with Node.js)
 
 ---
@@ -94,13 +120,13 @@ $env:BASE_PATH='/raffle-spinner/'; npm run build  # Windows PowerShell
 
 ## Customizing for Your Event
 
-All event-specific text lives in **three constants** at the top of [`src/App.jsx`](src/App.jsx). Update these for each new event — nothing else needs to change.
+All event-specific text lives in **three constants** in [`src/eventConfig.js`](src/eventConfig.js). Update these for each new event — nothing else needs to change.
 
 ```jsx
-// src/App.jsx
-const EVENT_NAME    = 'Edmonton Fabric User Group';
-const EVENT_TAGLINE = 'Global Fabric Day Raffle';
-const EVENT_DATE    = '2026-06-27'; // YYYY-MM-DD
+// src/eventConfig.js
+export const EVENT_NAME    = 'Edmonton Fabric User Group';
+export const EVENT_TAGLINE = 'Global Fabric Day Raffle';
+export const EVENT_DATE    = '2026-06-27'; // YYYY-MM-DD
 ```
 
 | Constant | What it controls | Example |
@@ -282,6 +308,14 @@ Since this is a fully static app with no backend, you can deploy the `dist/` fol
 - **Azure Static Web Apps** — `npm run build`, then deploy `dist/`
 - **GitHub Pages** — Use a GitHub Action to build and deploy
 - **Netlify / Vercel** — Connect your repo and set build command to `npm run build` with output directory `dist`
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, branch/PR conventions, and the commands you'll use (lint, test, build).
+
+For security issues, please follow [SECURITY.md](SECURITY.md) — use GitHub's private vulnerability reporting instead of an issue or PR.
 
 ---
 

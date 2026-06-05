@@ -13,6 +13,15 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # eslint-plugin-react@7.37.5 (latest) only declares peer support for
+      # eslint ^9.7; bumping eslint to 10.x breaks `npm ci`. Re-enable this
+      # update once eslint-plugin-react publishes a release that lists
+      # eslint@^10 as a supported peer.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"
