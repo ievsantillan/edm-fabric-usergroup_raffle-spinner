@@ -10,21 +10,7 @@ import { useAudio } from './hooks/useAudio';
 import { exportWinnersCsv } from './utils/exportWinners';
 import { clearAll as clearAllStorage, loadJson, saveJson } from './utils/storage';
 import './App.css';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// EVENT METADATA — update these three values for each new event.
-// EVENT_DATE accepts any value Date can parse (ISO format recommended).
-// The header subtitle is rendered as: `{EVENT_TAGLINE} · {formatted EVENT_DATE}`.
-// ─────────────────────────────────────────────────────────────────────────────
-const EVENT_NAME = 'Edmonton Fabric User Group';
-const EVENT_TAGLINE = 'Global Fabric Day Raffle';
-const EVENT_DATE = '2026-06-27'; // YYYY-MM-DD
-
-const EVENT_DATE_LABEL = new Date(`${EVENT_DATE}T00:00:00`).toLocaleDateString(
-  'en-US',
-  { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }
-);
-const EVENT_SUBTITLE = `${EVENT_TAGLINE} · ${EVENT_DATE_LABEL}`;
+import { EVENT_NAME, EVENT_DATE, EVENT_SUBTITLE } from './eventConfig';
 
 // localStorage keys (read/written via utils/storage which version-namespaces them).
 // useRaffle owns the raffle data slice; App owns these lightweight UI inputs.
