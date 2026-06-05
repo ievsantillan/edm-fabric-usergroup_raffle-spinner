@@ -58,10 +58,14 @@ function App() {
 
   // On first mount, if useRaffle restored an in-progress raffle from
   // localStorage, jump straight to the ready step and surface a banner so the
-  // user knows their previous state was recovered. Runs once.
+  // user knows their previous state was recovered. Runs once. The two
+  // setState calls below are a deliberate one-shot init from restored
+  // localStorage state, not a cascading reaction — the eslint rule added in
+  // eslint-plugin-react-hooks 7.1 (react-hooks/set-state-in-effect) doesn't
+  // recognise the [] deps array as making this safe, so we suppress it.
   useEffect(() => {
     if (allParticipants.length > 0) {
-      setStep('ready');
+      setStep('ready'); // eslint-disable-line react-hooks/set-state-in-effect
       setShowRestoredBanner(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
