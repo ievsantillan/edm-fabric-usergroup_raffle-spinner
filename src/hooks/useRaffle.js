@@ -149,6 +149,82 @@ export function useRaffle() {
     setShowWinner(false);
   }, []);
 
+  // Undo the last draw entirely — unlike re-roll, this puts the person BACK
+  // in the pool so they can be picked again. Use case: organizer drew for the
+  // wrong prize category, hit Continue, then realised the mistake. The
+  // restored participant is re-inserted in their original load-order position
+  // so the visible pool order stays stable across undos. Falls back to a
+  // simple append for legacy winner records that have no `id`.
+  const undoLastDraw = useCallback(() => {
+    setPersisted((prev) => {
+      if (prev.winners.length === 0) return prev;
+      const lastWinner = prev.winners[prev.winners.length - 1];
+      const nextWinners = prev.winners.slice(0, -1);
+      if (!lastWinner.id) {
+        // Legacy data with no id — we can't safely match against allParticipants,
+        // so just drop the winner record and leave the pool alone. Better than
+        // re-adding a phantom entry.
+        return { ...prev, winners: nextWinners };
+      }
+      const original = prev.allParticipants.find((p) => p.id === lastWinner.id);
+      if (!original) {
+        // Participant no longer in the master list (shouldn't happen, but
+        // guard for forward-compat). Drop the winner only.
+        return { ...prev, winners: nextWinners };
+      }
+      // Already in the pool? Shouldn't be possible (a winner can't also be
+      // remaining), but make the op idempotent just in case.
+      if (prev.remainingParticipants.some((p) => p.id === original.id)) {
+        return { ...prev, winners: nextWinners };
+      }
+      // Insert at the position that preserves allParticipants order. Find the
+      // first remaining participant whose original index is greater than ours
+      // and slot in before them.
+      const originalIdx = prev.allParticipants.indexOf(original);
+      const nextRemaining = prev.remainingParticipants.slice();
+      let insertAt = nextRemaining.findIndex(
+        (p) => prev.allParticipants.indexOf(p) > originalIdx
+      );
+      if (insertAt === -1) insertAt = nextRemaining.length;
+      nextRemaining.splice(insertAt, 0, original);
+      return {
+        ...prev,
+        winners: nextWinners,
+        remainingParticipants: nextRemaining,
+      };
+    });
+    setCurrentWinner(null);
+    setShowWinner(false);
+  }, []);
+
+  // Reorder the UNAWARDED tail of the prize list. The first `winners.length`
+  // prizes are locked (already given out) and any reorder request that
+  // touches them is rejected. Indices are relative to the unawarded slice,
+  // so 0 = next prize, 1 = the one after that, etc. — matches what the UI
+  // shows in the "Upcoming prizes" panel.
+  const reorderRemainingPrizes = useCallback((fromIdx, toIdx) => {
+    setPersisted((prev) => {
+      const awardedCount = prev.winners.length;
+      const remaining = prev.prizes.slice(awardedCount);
+      if (
+        fromIdx < 0 ||
+        toIdx < 0 ||
+        fromIdx >= remaining.length ||
+        toIdx >= remaining.length ||
+        fromIdx === toIdx
+      ) {
+        return prev;
+      }
+      const reordered = remaining.slice();
+      const [moved] = reordered.splice(fromIdx, 1);
+      reordered.splice(toIdx, 0, moved);
+      return {
+        ...prev,
+        prizes: [...prev.prizes.slice(0, awardedCount), ...reordered],
+      };
+    });
+  }, []);
+
   const resetRaffle = useCallback(() => {
     setPersisted((prev) => ({
       ...prev,
@@ -207,6 +283,8 @@ export function useRaffle() {
     dismissWinner,
     updateLastWinnerPrize,
     rerollLastWinner,
+    undoLastDraw,
+    reorderRemainingPrizes,
     resetRaffle,
     clearAll,
   };

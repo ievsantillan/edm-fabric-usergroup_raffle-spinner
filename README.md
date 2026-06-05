@@ -24,10 +24,12 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
 - **CSV & Excel support** — Upload `.csv`, `.xlsx`, or `.xls` files; pick which column contains names
 - **Multi-winner draws** — Previous winners are removed from the pool automatically
 - **Prize-to-winner assignment** — Optionally provide an ordered prize list; each draw auto-assigns the next prize. Override on the fly via a dropdown on the winner overlay if you want to swap which prize this person gets.
+- **Reorder upcoming prizes mid-event** — A collapsible **Prize queue** panel shows awarded + upcoming prizes; use the up/down arrows to reshuffle which prize the next spin awards. Already-awarded prizes are locked in place.
 - **"Not here — re-roll"** — If the drawn person isn't in the room, one click (or `N`) removes them from the pool, restores the prize, and immediately spins for a replacement. The absentee never appears in the winners list / CSV export.
+- **Undo last draw** — Hit `Ctrl+Z` (or click **Undo Last Draw**) to put the most recent winner back in the pool and unwind the prize assignment. Different from re-roll: undo treats the draw as a mistake; re-roll treats the winner as absent.
 - **Winner history sidebar** — Track all drawn winners in order, with one-click CSV export
-- **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `N` to re-roll an absent winner, `R` to reset, `E` to export winners to CSV
-- **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM) for post-event fulfillment & sponsor reporting
+- **Keyboard shortcuts** — `Space` to spin, `Esc` to dismiss the winner overlay, `N` to re-roll an absent winner, `Ctrl+Z` to undo the last draw, `R` to reset, `E` to export winners to CSV
+- **CSV export of winners** — Download a timestamped `…-winners-YYYY-MM-DD.csv` (Excel-friendly, UTF-8 with BOM, RFC-4180 escaped so commas and quotes in prize names round-trip cleanly) for post-event fulfillment & sponsor reporting
 - **Crash-safe — your raffle survives a refresh** — Participants, prizes, and winners are saved to `localStorage` after every change. Accidentally close the tab or the laptop goes to sleep? Reopen and continue exactly where you left off, with a restored-session banner so you know what happened.
 - **Duplicate-name safe** — Two attendees with the same name (e.g. two John Smiths) are tracked as separate entries, so picking one doesn't accidentally remove the other from the pool.
 - **Accessible** — Honors your OS-level **Reduce Motion** preference (skips the spin animation and confetti so reveals are instant), keeps keyboard focus on the SPIN button after each draw, and announces the winner via `aria-live` for screen readers.
@@ -163,6 +165,8 @@ Designed for one-handed presenter use — no clicking needed once the spinner is
 |---|---|---|
 | `Space` | Spin the wheel | On the spinner screen, idle, with participants & prizes remaining |
 | `Esc` | Dismiss the winner overlay | While the winner card is visible |
+| `N` | Re-roll an absent winner (removes them, restores prize, spins again) | While the winner card is visible |
+| `Ctrl`+`Z` / `⌘`+`Z` | Undo the last draw (puts the winner back in the pool, unwinds the prize) | At least one winner drawn, no spin in progress |
 | `R` | Reset raffle (returns all winners to the pool) | At least one winner drawn |
 | `E` | Export winners to CSV | At least one winner drawn |
 
@@ -263,6 +267,10 @@ After uploading, you'll be prompted to select which column contains the particip
 |---|---|
 | `Space` | Spin the raffle (when ready) |
 | `Escape` | Dismiss the winner overlay |
+| `N` | Re-roll an absent winner |
+| `Ctrl`+`Z` / `⌘`+`Z` | Undo the last draw |
+| `R` | Reset the raffle |
+| `E` | Export winners to CSV |
 
 ---
 

@@ -4,6 +4,7 @@ import ColumnSelector from './components/ColumnSelector';
 import SlotMachine from './components/SlotMachine';
 import WinnerDisplay from './components/WinnerDisplay';
 import WinnerHistory from './components/WinnerHistory';
+import PrizeQueue from './components/PrizeQueue';
 import { useRaffle } from './hooks/useRaffle';
 import { useAudio } from './hooks/useAudio';
 import { exportWinnersCsv } from './utils/exportWinners';
@@ -61,6 +62,8 @@ function App() {
     dismissWinner,
     updateLastWinnerPrize,
     rerollLastWinner,
+    undoLastDraw,
+    reorderRemainingPrizes,
     resetRaffle,
     clearAll: clearRaffleState,
   } = useRaffle();
@@ -175,6 +178,15 @@ function App() {
     exportWinnersCsv(winners, { eventName: EVENT_NAME, eventDate: EVENT_DATE });
   }, [winners]);
 
+  // Undo the last draw — puts the person BACK in the pool (unlike re-roll
+  // which keeps them filtered out). Use case: organiser noticed the draw
+  // happened under the wrong prize category, or the wrong button was hit.
+  // Single-level undo only; chained undos walk back one winner at a time.
+  const handleUndo = useCallback(() => {
+    if (winners.length === 0) return;
+    undoLastDraw();
+  }, [undoLastDraw, winners.length]);
+
   const handleNewFile = useCallback(() => {
     setFileData(null);
     setSelectedColumn('');
@@ -201,10 +213,12 @@ function App() {
   }, []);
 
   // Keyboard shortcuts for stage use:
-  //   Space  → spin (when ready, idle, no overlay, pool & prizes remain)
-  //   Esc    → dismiss the winner overlay
-  //   R      → reset raffle (only on ready step, idle, with at least one winner)
-  //   E      → export winners to CSV (only with at least one winner)
+  //   Space     → spin (when ready, idle, no overlay, pool & prizes remain)
+  //   Esc       → dismiss the winner overlay
+  //   N         → re-roll the just-drawn (absent) winner
+  //   Ctrl/Cmd+Z→ undo the last draw (puts the person back in the pool)
+  //   R         → reset raffle (only on ready step, idle, with at least one winner)
+  //   E         → export winners to CSV (only with at least one winner)
   // Shortcuts are ignored while focus is on an interactive form element so we
   // don't hijack typing in the prize textarea or column selector.
   useEffect(() => {
@@ -242,6 +256,25 @@ function App() {
       if (typingInFormField) return;
       // Also skip when a button has focus so Space/Enter on that button still works natively.
       if (tag === 'BUTTON' && (e.code === 'Space' || e.code === 'Enter')) return;
+
+      // Undo last draw — Ctrl+Z (Cmd+Z on Mac). Only fires on the ready step,
+      // when idle, no overlay open, with at least one winner to roll back.
+      // We explicitly do NOT support Shift+Ctrl+Z (redo) because there's no
+      // meaningful redo for a random draw — it would just pick a different
+      // winner.
+      if (
+        e.code === 'KeyZ' &&
+        (e.ctrlKey || e.metaKey) &&
+        !e.shiftKey &&
+        step === 'ready' &&
+        !isSpinning &&
+        !showWinner &&
+        winners.length > 0
+      ) {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
 
       if (
         e.code === 'Space' &&
@@ -292,6 +325,7 @@ function App() {
     handleReset,
     handleExport,
     handleReroll,
+    handleUndo,
   ]);
 
   return (
@@ -438,6 +472,14 @@ function App() {
                 </div>
               )}
 
+              {prizes.length > 0 && !allPrizesAwarded && (
+                <PrizeQueue
+                  prizes={prizes}
+                  awardedCount={winners.length}
+                  onReorder={reorderRemainingPrizes}
+                />
+              )}
+
               <SlotMachine
                 ref={slotRef}
                 key={sessionId}
@@ -456,6 +498,14 @@ function App() {
                 </button>
                 {winners.length > 0 && (
                   <>
+                    <button
+                      className="secondary-button"
+                      onClick={handleUndo}
+                      title="Undo the last draw (puts the person back in the pool)"
+                      aria-keyshortcuts="Control+Z Meta+Z"
+                    >
+                      ↶ Undo Last Draw
+                    </button>
                     <button
                       className="secondary-button"
                       onClick={handleExport}
@@ -481,6 +531,8 @@ function App() {
                 <kbd>Esc</kbd> dismiss
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
                 <kbd>N</kbd> re-roll
+                <span className="shortcuts-sep" aria-hidden="true">·</span>
+                <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
                 <kbd>R</kbd> reset
                 <span className="shortcuts-sep" aria-hidden="true">·</span>
