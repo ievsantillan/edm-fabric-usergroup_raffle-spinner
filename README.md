@@ -10,6 +10,7 @@ A visually appealing slot-machine-style raffle spinner built for the Edmonton Fa
   <img src="public/edm-fabric-usergroup-raffle-spinner_winner.png" alt="Raffle Spinner - Winner Screen" width="600" />
 </p>
 
+[![Deploy to GitHub Pages](https://github.com/ievsantillan/edm-fabric-usergroup_raffle-spinner/actions/workflows/deploy.yml/badge.svg)](https://github.com/ievsantillan/edm-fabric-usergroup_raffle-spinner/actions/workflows/deploy.yml)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
